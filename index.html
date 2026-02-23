@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activités de français - Monsieur Britt</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+        .container {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 600px;
+        }
+        h1 { font-size: 2.2em; margin-bottom: 10px; }
+        .subtitle { color: #94a3b8; font-size: 1.1em; margin-bottom: 40px; }
+        .year-cards { display: flex; flex-direction: column; gap: 16px; }
+        .year-card {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 24px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .year-card:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: #60a5fa;
+            transform: translateY(-2px);
+        }
+        .year-emoji { font-size: 2.5em; }
+        .year-info { text-align: left; }
+        .year-title { font-size: 1.3em; font-weight: bold; }
+        .year-grades { color: #94a3b8; font-size: 0.95em; margin-top: 4px; }
+        .footer { margin-top: 40px; color: #64748b; font-size: 0.85em; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🇫🇷 Activités de français</h1>
+        <p class="subtitle">Monsieur Britt | Britt Innovations Inc.</p>
+        <div class="year-cards">
+            <a href="year1.html" class="year-card">
+                <span class="year-emoji">📗</span>
+                <div class="year-info">
+                    <div class="year-title">Année 1 / Year 1</div>
+                    <div class="year-grades">Grades 4-5 (Junior)</div>
+                </div>
+            </a>
+            <a href="year2.html" class="year-card">
+                <span class="year-emoji">📘</span>
+                <div class="year-info">
+                    <div class="year-title">Année 2 / Year 2</div>
+                    <div class="year-grades">Grades 6-7 (Intermediate)</div>
+                </div>
+            </a>
+            <a href="year3.html" class="year-card">
+                <span class="year-emoji">📙</span>
+                <div class="year-info">
+                    <div class="year-title">Année 3 / Year 3</div>
+                    <div class="year-grades">Grade 8+ (Senior)</div>
+                </div>
+            </a>
+        </div>
+        <p class="footer">&copy; 2025-2026 Britt Innovations Inc. All Rights Reserved.</p>
+    </div>
+</body>
+</html>
