@@ -86,9 +86,12 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
 ================================================================================
 -->
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="notranslate" translate="no">
 <head>
     <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="fr">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Français Junior - Activités Interactives | Monsieur Britt</title>
     <style>
@@ -2653,7 +2656,25 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
             display: none !important;
         }
     
-</style>
+
+        /* ============================================ */
+        /* ANTI-TRANSLATION PROTECTION                 */
+        /* ============================================ */
+        .goog-te-banner-frame, .skiptranslate, 
+        #google_translate_element, .goog-te-spinner-pos,
+        .goog-te-menu-frame, iframe.goog-te-menu-frame,
+        [class*="translate"], .VIpgJd-ZVi9od-ORHb-OEVmcd,
+        .VIpgJd-ZVi9od-l4eHX-hSRGPd, #goog-gt-tt,
+        .goog-te-gadget, .goog-te-balloon-frame {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            opacity: 0 !important;
+        }
+        body { top: 0 !important; position: static !important; }
+        .translated-ltr, .translated-rtl { margin-top: 0 !important; }
+
+    </style>
 
 </head>
 <body>
@@ -2956,6 +2977,127 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
     <div id="confettiContainer" class="confetti-container"></div>
 
     <script>
+
+        // ============================================
+        // ANTI-TRANSLATION PROTECTION (4-Layer)
+        // ============================================
+        // Layer 1: Meta tags (already in HTML head)
+        // Layer 2: CSS hiding (already in stylesheet)
+        
+        // Layer 3: MutationObserver - detect when translation modifies the DOM
+        (function() {
+            let translationWarningShown = false;
+            
+            function showTranslationWarning() {
+                if (translationWarningShown) return;
+                translationWarningShown = true;
+                
+                // Create blocking overlay
+                const overlay = document.createElement('div');
+                overlay.id = 'translationBlockOverlay';
+                overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(220,38,38,0.95);z-index:999999;display:flex;align-items:center;justify-content:center;';
+                overlay.innerHTML = `
+                    <div style="text-align:center;color:white;padding:40px;max-width:500px;">
+                        <div style="font-size:4em;margin-bottom:20px;">🚫🌐</div>
+                        <h2 style="font-size:1.8em;margin-bottom:15px;">Translation Detected!</h2>
+                        <p style="font-size:1.2em;margin-bottom:10px;">Traduction détectée!</p>
+                        <p style="font-size:1.1em;margin-bottom:25px;opacity:0.9;">
+                            Turn OFF Google Translate to continue.<br>
+                            Désactive Google Traduction pour continuer.
+                        </p>
+                        <p style="font-size:1em;opacity:0.8;margin-bottom:20px;">
+                            On Chromebook: Click the translate icon in the address bar → "Never translate French"<br><br>
+                            Sur Chromebook: Clique l'icône de traduction dans la barre d'adresse → "Ne jamais traduire le français"
+                        </p>
+                        <button onclick="location.reload()" style="background:white;color:#dc2626;border:none;padding:15px 40px;border-radius:12px;font-size:1.2em;font-weight:bold;cursor:pointer;">
+                            🔄 J'ai désactivé / I turned it off - Reload
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            }
+            
+            function checkForTranslation() {
+                // Check 1: Google Translate class on html element
+                const html = document.documentElement;
+                if (html.classList.contains('translated-ltr') || 
+                    html.classList.contains('translated-rtl') ||
+                    html.getAttribute('class')?.includes('translated')) {
+                    showTranslationWarning();
+                    return true;
+                }
+                
+                // Check 2: Google Translate iframe/widget present
+                const frames = document.querySelectorAll('iframe');
+                for (const frame of frames) {
+                    if (frame.src && (frame.src.includes('translate') || frame.className.includes('goog-te'))) {
+                        showTranslationWarning();
+                        return true;
+                    }
+                }
+                
+                // Check 3: Google Translate elements
+                const gtElements = document.querySelectorAll('.goog-te-banner-frame, .skiptranslate, .goog-te-menu-frame, #goog-gt-tt, .VIpgJd-ZVi9od-ORHb-OEVmcd');
+                if (gtElements.length > 0) {
+                    showTranslationWarning();
+                    return true;
+                }
+                
+                // Check 4: Font elements injected by Google Translate
+                const fonts = document.querySelectorAll('font[style*="vertical-align"]');
+                if (fonts.length > 3) {
+                    showTranslationWarning();
+                    return true;
+                }
+                
+                return false;
+            }
+            
+            // Layer 4: MutationObserver watches for DOM changes from translation
+            const observer = new MutationObserver(function(mutations) {
+                for (const mutation of mutations) {
+                    // Watch for class changes on <html>
+                    if (mutation.type === 'attributes' && mutation.target === document.documentElement) {
+                        if (checkForTranslation()) return;
+                    }
+                    // Watch for new nodes (translate widgets)
+                    if (mutation.type === 'childList') {
+                        for (const node of mutation.addedNodes) {
+                            if (node.nodeType === 1) {
+                                const tag = node.tagName?.toLowerCase();
+                                const cls = node.className || '';
+                                const src = node.src || '';
+                                if (tag === 'iframe' && (src.includes('translate') || cls.includes('goog-te'))) {
+                                    showTranslationWarning();
+                                    return;
+                                }
+                                if (cls.includes && (cls.includes('skiptranslate') || cls.includes('goog-te') || cls.includes('VIpgJd'))) {
+                                    showTranslationWarning();
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Start observing once DOM is ready
+            if (document.documentElement) {
+                observer.observe(document.documentElement, {
+                    attributes: true,
+                    attributeFilter: ['class', 'lang', 'style'],
+                    childList: true,
+                    subtree: true
+                });
+            }
+            
+            // Periodic check every 2 seconds
+            setInterval(checkForTranslation, 2000);
+            
+            // Initial check
+            setTimeout(checkForTranslation, 1000);
+        })();
+        
 
 // Junior Activities v5.26 - Days 11-15 support added - Built 2025-02-21
         // ============================================
@@ -3653,7 +3795,7 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
         // Spelling state - UPDATED: 80% activity threshold, 75% letter similarity for "close enough"
         let spellingState = { correct: 0, total: 0, checked: {}, studentScores: [0, 0, 0], initialized: false, userAnswers: {} };
         const SPELLING_PASS_THRESHOLD = 0.5; // 50% of words needed to complete activity
-        const LETTER_SIMILARITY_THRESHOLD = 0.75; // 75% of letters correct = "close enough"
+        const LETTER_SIMILARITY_THRESHOLD = 0.60; // 60% of letters correct = "close enough"
         
         // Calculate similarity between two strings (percentage of matching letters)
         function calculateSimilarity(str1, str2) {
@@ -3702,7 +3844,22 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
                 .replace(/ß/g, 'ss');
         }
         
-        // Check if two strings match (with accent tolerance)
+    
+        // Clean vocab word for display - remove brackets and pick first slash alternative
+        // "content(e)" → "content", "nerveux/nerveuse" → "nerveux"
+        function cleanVocabForDisplay(word) {
+            if (!word) return '';
+            let cleaned = word.trim();
+            // Remove bracketed endings: content(e) → content, un(e) → un
+            cleaned = cleaned.replace(/\([^)]*\)/g, '');
+            // Pick first slash alternative: nerveux/nerveuse → nerveux
+            if (cleaned.includes('/')) {
+                cleaned = cleaned.split('/')[0].trim();
+            }
+            return cleaned.trim();
+        }
+        
+    // Check if two strings match (with accent tolerance)
         function matchesWithAccentTolerance(input, correct) {
             const normalizedInput = normalizeAccents(input);
             const normalizedCorrect = normalizeAccents(correct);
@@ -6945,7 +7102,7 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
                 let extraInfo = getActivitiesPreview(i);
                 let bonusFeature = getDayBonusPreview(i);
                 if (i === 5) { dayInfo = '📊 Révision Mi-Unité'; extraInfo = '🎭 Mad Libs'; }
-                else if (i === 10) { dayInfo = '📊 Révision #2'; extraInfo = '🎤 Présentations'; }
+                else if (i === 10) { dayInfo = '📊 Révision #2'; extraInfo = '🗣️ Pratique orale'; }
                 else if (i === 15) { dayInfo = '🏆 Révision Finale'; extraInfo = '🎤 Présentations'; }
                 else if (i === 11) { dayInfo = '📚 Nouveau vocabulaire'; }
                 else if (i === 12) { dayInfo = '🌍 Culture francophone'; }
@@ -7005,10 +7162,8 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
                 allActivities.splice(7, 0, 'madlibs'); // Add before speaking
             }
             
-            // Day 10: Add Presentation for second checkpoint
-            if (day === 10) {
-                allActivities.splice(9, 0, 'present'); // Add before conversation
-            }
+            // Day 10: Practice only (no presentation assessment)
+            // Presentations moved to Day 15 only (once per unit)
             
             // Day 15: Add Mad Libs + Presentation for final day
             if (day === 15) {
@@ -7651,8 +7806,33 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
         // ---- WORD SCRAMBLE GAME ----
         function renderWordScrambleGame(vocab) {
             const word = getUnusedWord(vocab);
-            const cleanWord = word.fr.replace(/^(le |la |l'|les |un |une )/, '');
-            const scrambled = cleanWord.split('').sort(() => Math.random() - 0.5).join('').toUpperCase();
+            // Clean the word: remove articles, pick first slash form, remove brackets
+            let cleanWord = word.fr.replace(/^(le |la |l'|les |un |une |des )/, '');
+            if (cleanWord.includes('/')) cleanWord = cleanWord.split('/')[0].trim();
+            cleanWord = cleanWord.replace(/\([^)]*\)/g, '').trim();
+            
+            // Scramble only letter characters, keep apostrophes/hyphens in place
+            const chars = cleanWord.split('');
+            const letterIndices = [];
+            const letters = [];
+            chars.forEach((ch, i) => {
+                if (/[a-zA-ZàâäéèêëïîôùûüÿçœæÀÂÄÉÈÊËÏÎÔÙÛÜŸÇŒÆ]/.test(ch)) {
+                    letterIndices.push(i);
+                    letters.push(ch);
+                }
+            });
+            // Shuffle only the letters
+            for (let i = letters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [letters[i], letters[j]] = [letters[j], letters[i]];
+            }
+            // Put shuffled letters back, keeping non-letters in place
+            let li = 0;
+            const scrambledChars = chars.map((ch, i) => {
+                if (letterIndices.includes(i)) return letters[li++];
+                return ch;
+            });
+            const scrambled = scrambledChars.join('').toUpperCase();
             gameState.currentWord = cleanWord;
             
             return `
@@ -7776,7 +7956,9 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
             // Build dynamic sentences from current vocab
             let dynamicSentences = [];
             if (vocab && vocab.length > 0) {
-                const usable = vocab.filter(w => w.fr.split(' ').length <= 3 && w.fr.length <= 20);
+                // Clean vocab words before building sentences
+                const cleanedVocab = vocab.map(w => ({...w, fr: cleanVocabForDisplay(w.fr)}));
+                const usable = cleanedVocab.filter(w => w.fr.split(' ').length <= 3 && w.fr.length <= 20);
                 const patterns = [
                     w => ({words: ["J'aime", ...w.fr.split(' ')], correct: "J'aime " + w.fr}),
                     w => ({words: ['Voici', ...w.fr.split(' ')], correct: 'Voici ' + w.fr}),
@@ -8804,7 +8986,25 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
                 .flashcard.active-timer .flashcard-front,
                 .flashcard.active-timer .flashcard-back { border: 3px solid #f59e0b; box-shadow: 0 0 15px rgba(245,158,11,0.5); }
                 .flashcard.locked { opacity: 0.5; cursor: not-allowed; }
-            </style>`;
+            
+        /* ============================================ */
+        /* ANTI-TRANSLATION PROTECTION                 */
+        /* ============================================ */
+        .goog-te-banner-frame, .skiptranslate, 
+        #google_translate_element, .goog-te-spinner-pos,
+        .goog-te-menu-frame, iframe.goog-te-menu-frame,
+        [class*="translate"], .VIpgJd-ZVi9od-ORHb-OEVmcd,
+        .VIpgJd-ZVi9od-l4eHX-hSRGPd, #goog-gt-tt,
+        .goog-te-gadget, .goog-te-balloon-frame {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            opacity: 0 !important;
+        }
+        body { top: 0 !important; position: static !important; }
+        .translated-ltr, .translated-rtl { margin-top: 0 !important; }
+
+    </style>`;
             
             html += `<div style="text-align:center;margin-top:20px;">
                 <button class="btn btn-success" id="flashcardCompleteBtn" onclick="tryCompleteFlashcards(${vocab.length})" disabled>✓ J'ai étudié les cartes! / I studied the cards!</button>
@@ -9122,7 +9322,7 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
                 if (w.fr && w.fr.includes('/')) {
                     const forms = w.fr.split('/').map(f => f.trim());
                     const picked = forms[Math.floor(Math.random() * forms.length)];
-                    return {...w, fr: picked, frFull: w.fr};
+                    return {...w, fr: picked.replace(/\([^)]*\)/g, '').trim(), frFull: w.fr};
                 }
                 // Same for English
                 if (w.en && w.en.includes('/')) {
@@ -9130,17 +9330,19 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
                     const picked = forms[Math.floor(Math.random() * forms.length)];
                     return {...w, en: picked};
                 }
-                return {...w, frFull: w.fr};
+                // Clean brackets: content(e) → content, grand(e) → grand
+                const cleanedFr = w.fr.replace(/\([^)]*\)/g, '').trim();
+                return {...w, fr: cleanedFr, frFull: w.fr};
             });
             
             // Instructions with requirements
             let html = `<div class="section-header"><button class="retry-btn" onclick="retryActivity('spelling')" title="Recommencer / Start Over">🔄 Retry</button><h3>🔤 Orthographe / Spelling</h3><p>See the English word → Write it in French! / Vois le mot anglais → Écris-le en français!</p></div>`;
             html += `<div class="instructions-box">
                 <h5>📋 Instructions:</h5>
-                <p class="fr">✅ Si tu as <strong>75% des lettres correctes</strong>, c'est "assez proche"!</p>
-                <p class="en">✅ If you have <strong>75% of the letters correct</strong>, it counts as "close enough"!</p>
-                <p class="fr" style="margin-top:8px;">⚠️ Tu dois avoir au moins <strong>80% des mots</strong> corrects pour compléter cette activité.</p>
-                <p class="en">⚠️ You need at least <strong>80% of words</strong> correct to complete this activity.</p>
+                <p class="fr">✅ Si tu as <strong>60% des lettres correctes</strong>, c'est "assez proche"!</p>
+                <p class="en">✅ If you have <strong>60% of the letters correct</strong>, it counts as "close enough"!</p>
+                <p class="fr" style="margin-top:8px;">⚠️ Tu dois avoir au moins <strong>50% des mots</strong> corrects pour compléter cette activité.</p>
+                <p class="en">⚠️ You need at least <strong>50% of words</strong> correct to complete this activity.</p>
                 <p class="fr" style="margin-top:8px;">💡 Tu peux aller voir les cartes de vocabulaire sans perdre ton travail!</p>
                 <p class="en">💡 You can check the flashcards without losing your work!</p>
             </div>`;
@@ -9303,8 +9505,8 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
             // Remove previous classes
             item.classList.remove('correct', 'incorrect', 'corrected');
             
-            // LENIENT: Accept if exact match OR 70%+ similar (was 80%)
-            if (isExactMatch || similarity >= 0.70) {
+            // LENIENT: Accept if exact match OR 60%+ similar (lowered for student accessibility)
+            if (isExactMatch || similarity >= 0.60) {
                 // Got it right (or close enough)
                 if (isRetry) {
                     // This is a correction after a wrong answer
@@ -10416,12 +10618,12 @@ Entry IDs: See googleFormsConfig.entryIds (lines ~2809-2815)
                 }
                 
                 // Shuffle options with correct answer
-                const options = shuffleArray([word.fr, ...distractors.slice(0, 3)]);  // FIXED: spread operator
+                const options = shuffleArray([cleanVocabForDisplay(word.fr), ...distractors.slice(0, 3).map(d => cleanVocabForDisplay(d))]);  // FIXED: spread operator
                 
                 exercises.push({
                     beforeBlank: template.before,
                     afterBlank: template.after,
-                    correctAnswer: word.fr,
+                    correctAnswer: cleanVocabForDisplay(word.fr),
                     options: options,
                     englishHint: template.english.replace('___', word.en),
                     wordType: wordType
@@ -15426,6 +15628,9 @@ Commence par demander: "Bonjour! Qu'est-ce que tu veux dire en français aujourd
             const dateStr = now.toLocaleDateString('fr-CA') + ' ' + now.toLocaleTimeString('fr-CA');
             
             const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="fr">
+
 <title>Preuve de travail - ${studentNames} - U${currentUnit}J${currentDay}</title>
 <style>body{font-family:Arial,sans-serif;max-width:700px;margin:30px auto;padding:20px;color:#1f2937;}
 h1{color:#1e40af;border-bottom:3px solid #3b82f6;padding-bottom:10px;}
@@ -15433,7 +15638,25 @@ h1{color:#1e40af;border-bottom:3px solid #3b82f6;padding-bottom:10px;}
 .strand{display:flex;justify-content:space-between;padding:8px 15px;margin:5px 0;border-radius:8px;}
 .done{color:#166534;} .skip{color:#991b1b;font-weight:bold;}
 .work{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:15px;margin:15px 0;white-space:pre-wrap;}
-.footer{text-align:center;color:#6b7280;font-size:0.85em;margin-top:30px;border-top:1px solid #e5e7eb;padding-top:15px;}</style></head>
+.footer{text-align:center;color:#6b7280;font-size:0.85em;margin-top:30px;border-top:1px solid #e5e7eb;padding-top:15px;}
+        /* ============================================ */
+        /* ANTI-TRANSLATION PROTECTION                 */
+        /* ============================================ */
+        .goog-te-banner-frame, .skiptranslate, 
+        #google_translate_element, .goog-te-spinner-pos,
+        .goog-te-menu-frame, iframe.goog-te-menu-frame,
+        [class*="translate"], .VIpgJd-ZVi9od-ORHb-OEVmcd,
+        .VIpgJd-ZVi9od-l4eHX-hSRGPd, #goog-gt-tt,
+        .goog-te-gadget, .goog-te-balloon-frame {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            opacity: 0 !important;
+        }
+        body { top: 0 !important; position: static !important; }
+        .translated-ltr, .translated-rtl { margin-top: 0 !important; }
+
+    </style></head>
 <body>
 <h1>📋 Preuve de Travail / Work Proof</h1>
 <div class="info">
